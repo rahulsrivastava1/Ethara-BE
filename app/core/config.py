@@ -7,5 +7,7 @@ class Settings(BaseSettings):
     app_name: str = "Ethara API"
     debug: bool = False
 
+    database_url: str = "postgresql://postgres:postgres@localhost:5432/ethara"
+
 
 settings = Settings()
