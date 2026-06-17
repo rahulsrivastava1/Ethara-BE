@@ -3,7 +3,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from sqlalchemy import text
 
-from app.api.routes import customers, health, orders, products
+from app.api.routes import customers, dashboard, health, orders, products
 from app.core.config import settings
 from app.db.session import engine
 
@@ -21,6 +21,7 @@ app.include_router(health.router)
 app.include_router(products.router)
 app.include_router(customers.router)
 app.include_router(orders.router)
+app.include_router(dashboard.router)
 
 
 @app.get("/")

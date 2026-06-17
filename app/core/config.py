@@ -8,6 +8,7 @@ class Settings(BaseSettings):
     debug: bool = False
 
     database_url: str = "postgresql://postgres:postgres@localhost:5432/ethara"
+    low_stock_threshold: int = 10
 
 
 settings = Settings()
