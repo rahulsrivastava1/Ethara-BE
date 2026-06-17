@@ -3,7 +3,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from sqlalchemy import text
 
-from app.api.routes import health, products
+from app.api.routes import customers, health, products
 from app.core.config import settings
 from app.db.session import engine
 
@@ -19,6 +19,7 @@ app = FastAPI(title=settings.app_name, debug=settings.debug, lifespan=lifespan)
 
 app.include_router(health.router)
 app.include_router(products.router)
+app.include_router(customers.router)
 
 
 @app.get("/")
