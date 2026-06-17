@@ -10,7 +10,11 @@ router = APIRouter(prefix="/products", tags=["products"])
 
 
 def _get_product_or_404(db: Session, product_id: int) -> Product:
-    product = db.get(Product, product_id)
+    product = (
+        db.query(Product)
+        .filter(Product.id == product_id, Product.is_active.is_(True))
+        .first()
+    )
     if product is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -37,7 +41,12 @@ def create_product(product_in: ProductCreate, db: Session = Depends(get_db)) -> 
 
 @router.get("", response_model=list[ProductResponse])
 def list_products(db: Session = Depends(get_db)) -> list[Product]:
-    return db.query(Product).order_by(Product.id).all()
+    return (
+        db.query(Product)
+        .filter(Product.is_active.is_(True))
+        .order_by(Product.id)
+        .all()
+    )
 
 
 @router.get("/{product_id}", response_model=ProductResponse)
@@ -69,5 +78,5 @@ def update_product(
 @router.delete("/{product_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_product(product_id: int, db: Session = Depends(get_db)) -> None:
     product = _get_product_or_404(db, product_id)
-    db.delete(product)
+    product.is_active = False
     db.commit()

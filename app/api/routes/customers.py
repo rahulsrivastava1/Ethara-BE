@@ -10,7 +10,11 @@ router = APIRouter(prefix="/customers", tags=["customers"])
 
 
 def _get_customer_or_404(db: Session, customer_id: int) -> Customer:
-    customer = db.get(Customer, customer_id)
+    customer = (
+        db.query(Customer)
+        .filter(Customer.id == customer_id, Customer.is_active.is_(True))
+        .first()
+    )
     if customer is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -37,7 +41,12 @@ def create_customer(customer_in: CustomerCreate, db: Session = Depends(get_db)) 
 
 @router.get("", response_model=list[CustomerResponse])
 def list_customers(db: Session = Depends(get_db)) -> list[Customer]:
-    return db.query(Customer).order_by(Customer.id).all()
+    return (
+        db.query(Customer)
+        .filter(Customer.is_active.is_(True))
+        .order_by(Customer.id)
+        .all()
+    )
 
 
 @router.get("/{customer_id}", response_model=CustomerResponse)
@@ -48,5 +57,5 @@ def get_customer(customer_id: int, db: Session = Depends(get_db)) -> Customer:
 @router.delete("/{customer_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_customer(customer_id: int, db: Session = Depends(get_db)) -> None:
     customer = _get_customer_or_404(db, customer_id)
-    db.delete(customer)
+    customer.is_active = False
     db.commit()

@@ -31,14 +31,33 @@ class OrderItemResponse(BaseModel):
     product_id: int
     quantity: int
     unit_price: Decimal
-    line_total: Decimal
+    total_price: Decimal
 
 
 class OrderResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     id: int
+    order_id: str
     customer_id: int
     total_amount: Decimal
+    total_items: int
     created_at: datetime
     items: list[OrderItemResponse]
+
+
+class OrderItemSummaryResponse(BaseModel):
+    product_name: str
+    sku: str
+    qty: int
+    unit_price: Decimal
+    total_price: Decimal
+
+
+class OrderListResponse(BaseModel):
+    id: int
+    order_id: str
+    customer_name: str
+    total_amount: Decimal
+    total_items: int
+    items: list[OrderItemSummaryResponse]

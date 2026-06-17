@@ -14,12 +14,30 @@ router = APIRouter(prefix="/dashboard", tags=["dashboard"])
 
 @router.get("", response_model=DashboardResponse)
 def get_dashboard(db: Session = Depends(get_db)) -> DashboardResponse:
-    total_products = db.query(func.count(Product.id)).scalar() or 0
-    total_customers = db.query(func.count(Customer.id)).scalar() or 0
-    total_orders = db.query(func.count(Order.id)).scalar() or 0
+    total_products = (
+        db.query(func.count(Product.id))
+        .filter(Product.is_active.is_(True))
+        .scalar()
+        or 0
+    )
+    total_customers = (
+        db.query(func.count(Customer.id))
+        .filter(Customer.is_active.is_(True))
+        .scalar()
+        or 0
+    )
+    total_orders = (
+        db.query(func.count(Order.id))
+        .filter(Order.is_active.is_(True))
+        .scalar()
+        or 0
+    )
     low_stock_products = (
         db.query(Product)
-        .filter(Product.available_qty <= settings.low_stock_threshold)
+        .filter(
+            Product.is_active.is_(True),
+            Product.available_qty <= settings.low_stock_threshold,
+        )
         .order_by(Product.available_qty, Product.id)
         .all()
     )
