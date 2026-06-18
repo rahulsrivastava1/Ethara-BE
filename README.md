@@ -17,6 +17,29 @@ A FastAPI backend for managing products, customers, orders, and a dashboard summ
 - Docker & Docker Compose (for PostgreSQL)
 - `pip` and `venv`
 
+## Docker
+
+Run the full stack (PostgreSQL + API) with Docker Compose:
+
+```bash
+docker compose up --build
+```
+
+The API will be available at **http://127.0.0.1:8000**
+
+Useful commands:
+
+| Command | Description |
+|---------|-------------|
+| `docker compose up --build -d` | Start in background |
+| `docker compose down` | Stop containers (data persists) |
+| `docker compose down -v` | Stop and remove database volume |
+| `docker compose logs -f api` | Follow API logs |
+
+Migrations run automatically when the API container starts.
+
+For local development without Docker, follow the steps below.
+
 ## Getting Started
 
 ### 1. Clone the repository

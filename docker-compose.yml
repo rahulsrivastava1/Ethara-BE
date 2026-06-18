@@ -9,6 +9,22 @@ services:
       POSTGRES_DB: ethara
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d ethara"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/ethara
+      LOW_STOCK_THRESHOLD: 10
+    depends_on:
+      postgres:
+        condition: service_healthy
 
 volumes:
   postgres_data:
