@@ -44,7 +44,7 @@ def list_products(db: Session = Depends(get_db)) -> list[Product]:
     return (
         db.query(Product)
         .filter(Product.is_active.is_(True))
-        .order_by(Product.id)
+        .order_by(Product.id.desc())
         .all()
     )
 

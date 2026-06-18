@@ -44,7 +44,7 @@ def list_customers(db: Session = Depends(get_db)) -> list[Customer]:
     return (
         db.query(Customer)
         .filter(Customer.is_active.is_(True))
-        .order_by(Customer.id)
+        .order_by(Customer.id.desc())
         .all()
     )
 

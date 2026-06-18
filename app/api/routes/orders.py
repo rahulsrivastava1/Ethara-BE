@@ -1,5 +1,5 @@
-from decimal import Decimal
 import secrets
+from decimal import Decimal
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session, selectinload
@@ -92,11 +92,7 @@ def _get_order_or_404(db: Session, order_id: int) -> Order:
 
 @router.post("", response_model=OrderResponse, status_code=status.HTTP_201_CREATED)
 def create_order(order_in: OrderCreate, db: Session = Depends(get_db)) -> OrderResponse:
-    customer = (
-        db.query(Customer)
-        .filter(Customer.id == order_in.customer_id, Customer.is_active.is_(True))
-        .first()
-    )
+    customer = db.query(Customer).filter(Customer.id == order_in.customer_id, Customer.is_active.is_(True)).first()
     if customer is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -105,10 +101,7 @@ def create_order(order_in: OrderCreate, db: Session = Depends(get_db)) -> OrderR
 
     product_ids = [item.product_id for item in order_in.items]
     products = (
-        db.query(Product)
-        .filter(Product.id.in_(product_ids), Product.is_active.is_(True))
-        .with_for_update()
-        .all()
+        db.query(Product).filter(Product.id.in_(product_ids), Product.is_active.is_(True)).with_for_update().all()
     )
     products_by_id = {product.id: product for product in products}
 
@@ -128,11 +121,7 @@ def create_order(order_in: OrderCreate, db: Session = Depends(get_db)) -> OrderR
         if product.available_qty < item_in.quantity:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail=(
-                    f"Insufficient inventory for product "
-                    f"({product.product_name}): "
-                    f"requested {item_in.quantity}, available {product.available_qty}"
-                ),
+                detail="Insufficient inventory",
             )
 
         line_total = product.price * item_in.quantity
@@ -176,7 +165,7 @@ def list_orders(db: Session = Depends(get_db)) -> list[OrderListResponse]:
             selectinload(Order.items).selectinload(OrderItem.product),
         )
         .filter(Order.is_active.is_(True))
-        .order_by(Order.id)
+        .order_by(Order.id.desc())
         .all()
     )
     return [_build_order_list_response(order) for order in orders]
